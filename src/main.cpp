@@ -17,7 +17,7 @@ public:
     bool SetBoard(const SudokuBoard& data)
     {
         board = data;
-        return CheckIfValid();
+        return CheckIfDataValid();
     }
 
     bool Solver(SudokuBoard& result)
@@ -32,7 +32,7 @@ public:
     }
 
 private:
-    bool CheckIfValid() const
+    bool CheckIfDataValid() const
     {
         for (Uint i = 0; i < 9; ++i)
         {
@@ -61,7 +61,7 @@ private:
         return true;
     }
 
-    bool CheckIfThereAreEmptyPositions(const SudokuBoard& new_try) const
+    bool CheckIfThereAreEmptyPlaces(const SudokuBoard& new_try) const
     {
         for (auto& row : new_try)
         {
@@ -110,21 +110,21 @@ private:
         return data;
     }
 
-    bool CheckIfRowSatisfied(const SudokuBoard& new_try, Uint row) const
+    bool CheckIfSpecificRowSatisfied(const SudokuBoard& new_try, Uint row) const
     {
         std::array<Uint, 9> data = GetSpecificRow(new_try, row);
         std::sort(data.begin(), data.end());
         return CheckDataContainsOne2NineUniquely(data);
     }
 
-    bool CheckIfColumnSatisfied(const SudokuBoard& new_try, Uint col) const
+    bool CheckIfSpecificColumnSatisfied(const SudokuBoard& new_try, Uint col) const
     {
         std::array<Uint, 9> data = GetSpecificColumn(new_try, col);
         std::sort(data.begin(), data.end());
         return CheckDataContainsOne2NineUniquely(data);
     }
 
-    bool CheckIfBlockSatisfied(const SudokuBoard& new_try, Uint block) const
+    bool CheckIfSpecificBlockSatisfied(const SudokuBoard& new_try, Uint block) const
     {
         std::array<Uint, 9> data = GetSpecificBlock(new_try, block);
         std::sort(data.begin(), data.end());
@@ -133,23 +133,23 @@ private:
 
     bool CheckIfWin(const SudokuBoard& new_try) const
     {
-        if (CheckIfThereAreEmptyPositions(new_try))
+        if (CheckIfThereAreEmptyPlaces(new_try))
             return false;
 
         for (Uint i = 0; i < 9; ++i)
         {
             for (Uint j = 0; j < 9; ++j)
             {
-                if (!CheckIfRowSatisfied(new_try, i)) return false;
-                if (!CheckIfColumnSatisfied(new_try, j)) return false;
-                if (!CheckIfBlockSatisfied(new_try, (i / 3) * 3 + j / 3)) return false;
+                if (!CheckIfSpecificRowSatisfied(new_try, i)) return false;
+                if (!CheckIfSpecificColumnSatisfied(new_try, j)) return false;
+                if (!CheckIfSpecificBlockSatisfied(new_try, (i / 3) * 3 + j / 3)) return false;
             }
         }
 
         return true;
     }
 
-    bool CheckIfPlaceValid(const SudokuBoard& new_try, Uint i, Uint j)
+    bool CheckIfPlacementValid(const SudokuBoard& new_try, Uint i, Uint j)
     {
         std::array<Uint, 9> row = GetSpecificRow(new_try, i);
         std::array<Uint, 9> col = GetSpecificColumn(new_try, j);
@@ -268,7 +268,7 @@ private:
         for (Uint i = 0; i < ep.array_of_digits_can_be_placed.size(); ++i)
         {
             new_try[ep.i][ep.j] = ep.array_of_digits_can_be_placed[i];
-            if (!CheckIfPlaceValid(new_try, ep.i, ep.j)) continue;
+            if (!CheckIfPlacementValid(new_try, ep.i, ep.j)) continue;
             bool found = PutDigitRecuresely(new_try, index + 1);
             if (found)
                 return true;
